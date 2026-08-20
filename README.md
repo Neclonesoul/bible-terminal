@@ -164,19 +164,24 @@ The Bible database is embedded inside the executable.
 
 # DOWNLOAD
 
+### [→ OPEN THE LATEST RELEASE](https://github.com/Neclonesoul/bible-terminal/releases/latest)
+
+Choose the binary for your operating system below.
+
+
 Download the binary for your machine from the **Releases** section.
 
 ## Windows
 
 **Most Windows PCs**
 
-`bible-terminal-v0.1.0-windows-amd64.exe`
+[`bible-terminal-v0.1.0-windows-amd64.exe`](https://github.com/Neclonesoul/bible-terminal/releases/download/v0.1.0/bible-terminal-v0.1.0-windows-amd64.exe)
 
 → Intel or AMD 64-bit Windows.
 
 **Windows ARM**
 
-`bible-terminal-v0.1.0-windows-arm64.exe`
+[`bible-terminal-v0.1.0-windows-arm64.exe`](https://github.com/Neclonesoul/bible-terminal/releases/download/v0.1.0/bible-terminal-v0.1.0-windows-arm64.exe)
 
 → Windows ARM PCs, including Snapdragon systems.
 
@@ -184,13 +189,13 @@ Download the binary for your machine from the **Releases** section.
 
 **Apple Silicon**
 
-`bible-terminal-v0.1.0-macos-arm64`
+[`bible-terminal-v0.1.0-macos-arm64`](https://github.com/Neclonesoul/bible-terminal/releases/download/v0.1.0/bible-terminal-v0.1.0-macos-arm64)
 
 → M1 and newer Apple Silicon Macs.
 
 **Intel Mac**
 
-`bible-terminal-v0.1.0-macos-amd64`
+[`bible-terminal-v0.1.0-macos-amd64`](https://github.com/Neclonesoul/bible-terminal/releases/download/v0.1.0/bible-terminal-v0.1.0-macos-amd64)
 
 → Intel-based Macs.
 
@@ -198,19 +203,19 @@ Download the binary for your machine from the **Releases** section.
 
 **Most Linux PCs**
 
-`bible-terminal-v0.1.0-linux-amd64`
+[`bible-terminal-v0.1.0-linux-amd64`](https://github.com/Neclonesoul/bible-terminal/releases/download/v0.1.0/bible-terminal-v0.1.0-linux-amd64)
 
 → Standard Intel/AMD x86-64 Linux systems.
 
 **Linux ARM64**
 
-`bible-terminal-v0.1.0-linux-arm64`
+[`bible-terminal-v0.1.0-linux-arm64`](https://github.com/Neclonesoul/bible-terminal/releases/download/v0.1.0/bible-terminal-v0.1.0-linux-arm64)
 
 → ARM64 Linux, Raspberry Pi and compatible SBCs.
 
 ## Android / Termux
 
-`bible-terminal-v0.1.0-android-arm64`
+[`bible-terminal-v0.1.0-android-arm64`](https://github.com/Neclonesoul/bible-terminal/releases/download/v0.1.0/bible-terminal-v0.1.0-android-arm64)
 
 → ARM64 Android devices running Termux.
 
@@ -248,7 +253,7 @@ bible
 
 ## Windows
 
-Download `bible-terminal-v0.1.0-windows-amd64.exe`, rename it to
+Download [`bible-terminal-v0.1.0-windows-amd64.exe`](https://github.com/Neclonesoul/bible-terminal/releases/download/v0.1.0/bible-terminal-v0.1.0-windows-amd64.exe), rename it to
 `bible.exe` if desired, and run from PowerShell or Windows Terminal:
 
 ``` powershell
