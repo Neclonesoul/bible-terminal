@@ -1,0 +1,14 @@
+# Local binaries
+/bible
+/dist/
+
+# Editor files
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+
+# Temporary files
+/tmp/
