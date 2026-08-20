@@ -163,13 +163,13 @@ func main() {
 		{
 			Edition:      "kjv",
 			Base:         "https://raw.githubusercontent.com/aruljohn/Bible-kjv/master",
-			Output:       "data/kjv.tsv",
+			Output:       "internal/data/kjv.tsv",
 			RemoveSpaces: true,
 		},
 		{
 			Edition:      "1611",
 			Base:         "https://raw.githubusercontent.com/aruljohn/Bible-kjv-1611/main",
-			Output:       "data/kjv1611.tsv",
+			Output:       "internal/data/kjv1611.tsv",
 			RemoveSpaces: false,
 		},
 	}
