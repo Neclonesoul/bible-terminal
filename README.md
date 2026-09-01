@@ -1,4 +1,4 @@
-::: {align="center"}
+
 # ✠ BIBLE TERMINAL ✠
 
 ### VERBUM TUUM VERITAS
