@@ -7,10 +7,12 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"unicode/utf8"
 
 	bibledata "github.com/Neclonesoul/bible-terminal/internal/data"
 	biblesearch "github.com/Neclonesoul/bible-terminal/internal/search"
+	"github.com/Neclonesoul/bible-terminal/internal/speech"
 	"golang.org/x/term"
 )
 
@@ -27,6 +29,12 @@ type Reader struct {
 	Edition string
 	Mode    string
 	Scroll  int
+
+	// mu guards the reader while a finished reading redraws the screen.
+	mu      sync.Mutex
+	speaker *speech.Speaker
+	spoken  string
+	notice  string
 }
 
 func New() *Reader {
@@ -697,6 +705,69 @@ func (r *Reader) gotoReference(input string) {
 	r.Scroll = 0
 }
 
+func (r *Reader) place() string {
+	return fmt.Sprintf("%s %d", strings.ToLower(r.Book), r.Chapter)
+}
+
+func (r *Reader) stopSpeaking() {
+	if r.speaker == nil {
+		return
+	}
+
+	s := r.speaker
+	r.speaker = nil
+	s.Stop()
+}
+
+// toggleSpeech starts reading the current chapter aloud, or stops a
+// reading in progress. The standard KJV wording is always spoken,
+// because speech engines cannot pronounce 1611 spelling.
+func (r *Reader) toggleSpeech() {
+	if r.speaker != nil {
+		r.stopSpeaking()
+		return
+	}
+
+	verses := load(bibledata.KJV, r.Book, r.Chapter)
+
+	if len(verses) == 0 {
+		r.notice = "No modern-spelling text to read aloud here"
+		return
+	}
+
+	texts := make([]string, len(verses))
+
+	for i, v := range verses {
+		texts[i] = v.Text
+	}
+
+	s, err := speech.Start(speech.Passage(
+		fmt.Sprintf("%s, chapter %d", verses[0].Book, r.Chapter),
+		texts,
+	))
+
+	if err != nil {
+		r.notice = "Cannot read aloud: " + err.Error()
+		return
+	}
+
+	r.speaker = s
+	r.spoken = r.place()
+
+	// Redraw when the reading ends by itself, so the status clears.
+	go func() {
+		<-s.Done()
+
+		r.mu.Lock()
+		defer r.mu.Unlock()
+
+		if r.speaker == s {
+			r.speaker = nil
+			r.render()
+		}
+	}()
+}
+
 func (r *Reader) render() {
 	clear()
 
@@ -817,12 +888,18 @@ func (r *Reader) render() {
 		percent,
 	)
 
+	if r.speaker != nil {
+		status += " · ♪ READING ALOUD · s stops"
+	} else if r.notice != "" {
+		status += " · " + r.notice
+	}
+
 	fmt.Printf(
 		"│ %s │\n",
 		pad(status, inner),
 	)
 
-	controls := "↑↓ scroll · ←→ chapter · b books · v · c · g · / · q"
+	controls := "↑↓ scroll · ←→ chapter · b books · v · c · g · / · s · q"
 
 	fmt.Printf(
 		"│ %s │\n",
@@ -1017,7 +1094,15 @@ func Run() {
 		return
 	}
 
+	reader := New()
+
+	// The loop below holds the lock except while waiting for a key.
+	reader.mu.Lock()
+
 	defer func() {
+		reader.stopSpeaking()
+		reader.mu.Unlock()
+
 		term.Restore(fd, originalState)
 		fmt.Print("\033[?25h")
 		clear()
@@ -1025,13 +1110,21 @@ func Run() {
 
 	fmt.Print("\033[?25l")
 
-	reader := New()
 	input := bufio.NewReader(os.Stdin)
 
 	for {
+		// Leaving the chapter that is being read aloud ends the reading.
+		if reader.speaker != nil && reader.spoken != reader.place() {
+			reader.stopSpeaking()
+		}
+
 		reader.render()
+		reader.notice = ""
+		reader.mu.Unlock()
 
 		key, err := input.ReadByte()
+
+		reader.mu.Lock()
 
 		if err != nil {
 			return
@@ -1040,6 +1133,9 @@ func Run() {
 		switch key {
 		case 'q':
 			return
+
+		case 's':
+			reader.toggleSpeech()
 
 		case 'j':
 			reader.Scroll++

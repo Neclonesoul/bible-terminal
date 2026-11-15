@@ -13,6 +13,7 @@ import (
 
 	bibledata "github.com/Neclonesoul/bible-terminal/internal/data"
 	biblesearch "github.com/Neclonesoul/bible-terminal/internal/search"
+	"github.com/Neclonesoul/bible-terminal/internal/speech"
 	bibletui "github.com/Neclonesoul/bible-terminal/internal/tui"
 )
 
@@ -33,12 +34,17 @@ Usage:
   bible --kjv BOOK CHAPTER:VERSE
   bible --1611 BOOK CHAPTER:VERSE
   bible --compare BOOK CHAPTER:VERSE
+  bible --sound BOOK CHAPTER:VERSE
+  bible --search "PHRASE"
+
+Add --sound (or --voice, --speak) to any reference to hear it read aloud.
 
 Examples:
   bible Psalm 23
   bible Jn 3:16
   bible --1611 John 3:16
-  bible --compare John 3:16`)
+  bible --compare John 3:16
+  bible --sound Psalm 23`)
 }
 
 func canonicalBook(book string) string {
@@ -470,6 +476,33 @@ func printSearchResults(edition, query string, results []biblesearch.Result) {
 	fmt.Println()
 }
 
+// speakPassage reads the passage aloud. The standard KJV wording is
+// always used, because speech engines cannot pronounce 1611 spelling.
+func speakPassage(book string, chapter, verse int, specific bool) {
+	verses, err := load(bibledata.KJV, "KJV", book, chapter, verse, specific)
+	if err != nil || len(verses) == 0 {
+		fmt.Fprintf(os.Stderr,
+			"Cannot read aloud: %s %d has no modern-spelling KJV text.\n",
+			book, chapter)
+		os.Exit(1)
+	}
+
+	announce := ""
+	if !specific {
+		announce = fmt.Sprintf("%s, chapter %d", verses[0].Book, chapter)
+	}
+
+	texts := make([]string, len(verses))
+	for i, v := range verses {
+		texts[i] = v.Text
+	}
+
+	if err := speech.Speak(speech.Passage(announce, texts)); err != nil {
+		fmt.Fprintln(os.Stderr, "Cannot read aloud:", err)
+		os.Exit(1)
+	}
+}
+
 func main() {
 
 	// SEARCH_MODE_HANDLER_V1
@@ -515,9 +548,24 @@ func main() {
 		return
 	}
 
-	args := os.Args[1:]
+	speak := false
+
+	var args []string
+	for _, arg := range os.Args[1:] {
+		if arg == "--sound" || arg == "--voice" || arg == "--speak" {
+			speak = true
+			continue
+		}
+		args = append(args, arg)
+	}
 
 	if len(args) == 0 {
+		if speak {
+			fmt.Fprintln(os.Stderr, "Error: --sound requires a reference")
+			usage()
+			os.Exit(1)
+		}
+
 		bibletui.Run()
 		return
 	}
@@ -632,5 +680,9 @@ func main() {
 		}
 
 		printComparison(book, chapter, kjv, old)
+	}
+
+	if speak {
+		speakPassage(book, chapter, verse, specific)
 	}
 }
