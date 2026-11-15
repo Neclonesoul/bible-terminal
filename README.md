@@ -119,7 +119,7 @@ and Bible Terminal becomes an interactive reader.
 │                                                              │
 ├──────────────────────────────────────────────────────────────┤
 │ PSALMS 23 · KJV · 0%                                         │
-│ ↑↓ scroll · ←→ chapter · b books · v · c · g · / · q        │
+│ ↑↓ scroll · ←→ chapter · b books · v · c · g · / · s · q    │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -136,6 +136,7 @@ and Bible Terminal becomes an interactive reader.
       `c`     Comparison mode
       `g`     Go directly to a reference
       `/`     Search
+      `s`     Read the chapter aloud / stop
       `q`     Quit
 
 ------------------------------------------------------------------------
@@ -159,6 +160,32 @@ Search happens entirely on your machine.
 The Bible database is embedded inside the executable.
 
 **Internet required: 0 bytes.**
+
+------------------------------------------------------------------------
+
+# HEAR THE WORD
+
+Add `--sound` to any reference to hear it read aloud:
+
+``` sh
+bible --sound Psalm 23
+bible --sound John 3:16
+```
+
+In the interactive reader, press `s` to read the current chapter aloud
+and `s` again to stop.
+
+Bible Terminal uses the voice already built into your system, so
+nothing is downloaded and nothing leaves your machine:
+
+  System    Voice
+  --------- --------------------------------------------
+  Windows   Built-in Windows speech (no setup)
+  macOS     Built-in `say` command (no setup)
+  Linux     `espeak-ng` (for example `sudo apt install espeak-ng`)
+
+The standard KJV wording is always the one spoken, even with `--1611`
+or `--compare`, because speech engines cannot pronounce 1611 spelling.
 
 ------------------------------------------------------------------------
 
@@ -425,6 +452,9 @@ bible --1611 John 3:16
 
 # Compare the editions
 bible --compare John 3:16
+
+# Hear a chapter read aloud
+bible --sound Psalm 23
 
 # Search KJV
 bible --search "the truth shall make you free"
