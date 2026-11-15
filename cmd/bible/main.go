@@ -141,11 +141,18 @@ func canonicalBook(book string) string {
 }
 
 func parseReference(args []string) (string, int, int, bool, error) {
-	if len(args) < 2 {
+	if len(args) == 0 {
 		return "", 0, 0, false, fmt.Errorf("missing reference")
 	}
 
 	last := args[len(args)-1]
+
+	// A book name on its own ("john", "1 john", "song of solomon")
+	// opens chapter 1.
+	if len(args) == 1 || (last[0] < '0' || last[0] > '9') {
+		return canonicalBook(strings.Join(args, " ")), 1, 0, false, nil
+	}
+
 	book := canonicalBook(strings.Join(args[:len(args)-1], " "))
 
 	if strings.Contains(last, ":") {
